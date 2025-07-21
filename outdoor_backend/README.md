@@ -1,0 +1,322 @@
+# Backend - Sistema de Aluguel de Outdoors
+
+## 🚀 Tecnologias Utilizadas
+
+- Node.js
+- Express.js
+- PostgreSQL
+- JWT para autenticação
+- Bcrypt para criptografia
+- Express Validator
+- Helmet para segurança
+- CORS
+- Morgan para logging
+
+## 📋 Pré-requisitos
+
+- Node.js >= 14.x
+- PostgreSQL >= 12.x
+- npm ou yarn
+
+## 🔧 Instalação
+
+1. Clone o repositório:
+
+```bash
+git clone <seu-repositorio>
+cd outdoor-rental-backend
+```
+
+2. Instale as dependências:
+
+```bash
+npm install
+```
+
+3. Configure o banco de dados PostgreSQL e crie o banco:
+
+```bash
+psql -U postgres
+CREATE DATABASE outdoor_rental;
+```
+
+4. Execute o script SQL para criar as tabelas:
+
+```bash
+psql -U postgres -d outdoor_rental -f src/database/schema.sql
+```
+
+5. Configure as variáveis de ambiente criando um arquivo `.env`:
+
+```env
+DATABASE_URL=postgresql://usuario:senha@localhost:5432/outdoor_rental
+JWT_SECRET=sua_chave_secreta_aqui_muito_segura_2024
+PORT=3333
+NODE_ENV=development
+```
+
+6. Execute o seed para popular o banco com dados iniciais:
+
+```bash
+npm run seed
+```
+
+7. Inicie o servidor:
+
+```bash
+npm run dev
+```
+
+## 📚 Documentação da API
+
+### Autenticação
+
+#### Login
+
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@outdoors.com",
+  "senha": "admin123"
+}
+```
+
+#### Registro (Admin)
+
+```http
+POST /api/auth/register
+Content-Type: application/json
+
+{
+  "email": "novo@admin.com",
+  "senha": "senha123",
+  "nome": "Novo Admin"
+}
+```
+
+### Rotas Públicas
+
+#### Listar Outdoors com Disponibilidade
+
+```http
+GET /api/public/outdoors?mes=7&ano=2024
+```
+
+### Rotas Protegidas (Requer Token JWT)
+
+#### Headers necessários:
+
+```http
+Authorization: Bearer <seu-token-jwt>
+```
+
+#### Outdoors
+
+##### Listar todos os outdoors
+
+```http
+GET /api/outdoors
+```
+
+##### Buscar outdoor por ID
+
+```http
+GET /api/outdoors/:id
+```
+
+##### Criar outdoor
+
+```http
+POST /api/outdoors
+Content-Type: application/json
+
+{
+  "nome": "Novo Outdoor",
+  "localizacao": "Rua Example, 123",
+  "dimensoes": "9x3 metros",
+  "preco_mensal": 5000.00,
+  "foto_url": "https://example.com/foto.jpg",
+  "descricao": "Descrição do outdoor"
+}
+```
+
+##### Atualizar outdoor
+
+```http
+PUT /api/outdoors/:id
+Content-Type: application/json
+
+{
+  "nome": "Outdoor Atualizado",
+  "localizacao": "Nova localização",
+  "dimensoes": "10x4 metros",
+  "preco_mensal": 6000.00,
+  "foto_url": "https://example.com/nova-foto.jpg",
+  "descricao": "Nova descrição",
+  "ativo": true
+}
+```
+
+##### Deletar outdoor
+
+```http
+DELETE /api/outdoors/:id
+```
+
+#### Disponibilidade
+
+##### Verificar disponibilidade por período
+
+```http
+GET /api/disponibilidade?mes=7&ano=2024
+```
+
+##### Verificar disponibilidade de um outdoor
+
+```http
+GET /api/disponibilidade/outdoor/:outdoorId
+```
+
+##### Criar reserva
+
+```http
+POST /api/disponibilidade/reservar
+Content-Type: application/json
+
+{
+  "outdoor_id": 1,
+  "mes": 7,
+  "ano": 2024,
+  "cliente_nome": "Nome do Cliente",
+  "cliente_contato": "(11) 98765-4321",
+  "cliente_email": "cliente@email.com",
+  "observacoes": "Observações da reserva"
+}
+```
+
+##### Cancelar reserva
+
+```http
+DELETE /api/disponibilidade/cancelar/:id
+```
+
+##### Relatório de ocupação
+
+```http
+GET /api/disponibilidade/relatorio?startMonth=1&startYear=2024&endMonth=12&endYear=2024
+```
+
+## 🛡️ Segurança
+
+- Autenticação JWT em todas as rotas administrativas
+- Senhas criptografadas com Bcrypt
+- Validação de entrada com Express Validator
+- Headers de segurança com Helmet
+- CORS configurado
+
+## 📁 Estrutura do Projeto
+
+```
+outdoor-rental-backend/
+├── src/
+│   ├── config/
+│   │   └── database.js
+│   ├── controllers/
+│   │   ├── authController.js
+│   │   ├── outdoorController.js
+│   │   └── disponibilidadeController.js
+│   ├── database/
+│   │   └── schema.sql
+│   ├── middleware/
+│   │   ├── auth.js
+│   │   ├── errorHandler.js
+│   │   └── validation.js
+│   ├── models/
+│   │   ├── Disponibilidade.js
+│   │   ├── Outdoor.js
+│   │   └── Usuario.js
+│   ├── routes/
+│   │   ├── authRoutes.js
+│   │   ├── disponibilidadeRoutes.js
+│   │   ├── index.js
+│   │   ├── outdoorRoutes.js
+│   │   └── publicRoutes.js
+│   └── seeders/
+│       └── seed.js
+├── .env
+├── .gitignore
+├── package.json
+├── README.md
+└── server.js
+```
+
+## 🚀 Deploy
+
+### Heroku
+
+1. Instale o Heroku CLI
+2. Crie um app no Heroku:
+
+```bash
+heroku create seu-app-outdoor-backend
+```
+
+3. Adicione o addon do PostgreSQL:
+
+```bash
+heroku addons:create heroku-postgresql:hobby-dev
+```
+
+4. Configure as variáveis de ambiente:
+
+```bash
+heroku config:set JWT_SECRET=sua_chave_secreta_producao
+heroku config:set NODE_ENV=production
+```
+
+5. Deploy:
+
+```bash
+git push heroku main
+```
+
+6. Execute o seed em produção:
+
+```bash
+heroku run npm run seed
+```
+
+### Railway
+
+1. Conecte seu repositório GitHub ao Railway
+2. Adicione o serviço PostgreSQL
+3. Configure as variáveis de ambiente
+4. Deploy automático a cada push
+
+## 🔍 Testes
+
+Para testar a API, você pode usar:
+
+- Postman
+- Insomnia
+- Thunder Client (VS Code)
+- curl
+
+Exemplo de teste com curl:
+
+```bash
+# Login
+curl -X POST http://localhost:3333/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@outdoors.com","senha":"admin123"}'
+
+# Listar outdoors (use o token retornado no login)
+curl -X GET http://localhost:3333/api/outdoors \
+  -H "Authorization: Bearer SEU_TOKEN_AQUI"
+```
+
+## 📝 Licença
+
+Este projeto está sob a licença MIT.

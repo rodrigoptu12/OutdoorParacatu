@@ -1,0 +1,743 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2024-01-01T00:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "req_001",
+      "parentId": "fld_auth",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "url": "{{ _.base_url }}/api/auth/login",
+      "name": "Login",
+      "description": "Autenticação de administrador",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"admin@outdoors.com\",\n  \"senha\": \"admin123\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704067200000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_002",
+      "parentId": "fld_auth",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "url": "{{ _.base_url }}/api/auth/register",
+      "name": "Registrar Novo Admin",
+      "description": "Criar novo usuário administrador",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"novo.admin@outdoors.com\",\n  \"senha\": \"senha123\",\n  \"nome\": \"Novo Administrador\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704067100000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_003",
+      "parentId": "fld_auth",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "url": "{{ _.base_url }}/api/auth/me",
+      "name": "Dados do Usuário Logado",
+      "description": "Retorna informações do usuário autenticado",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704067000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_004",
+      "parentId": "fld_public",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "url": "{{ _.base_url }}/api/public/outdoors",
+      "name": "Listar Outdoors Públicos (Mês Atual)",
+      "description": "Lista outdoors com disponibilidade do mês atual",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1704066900000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_005",
+      "parentId": "fld_public",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "url": "{{ _.base_url }}/api/public/outdoors",
+      "name": "Listar Outdoors Públicos (Mês Específico)",
+      "description": "Lista outdoors com disponibilidade de um mês específico",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        {
+          "name": "mes",
+          "value": "7",
+          "description": "Mês (1-12)"
+        },
+        {
+          "name": "ano",
+          "value": "2024",
+          "description": "Ano"
+        }
+      ],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1704066800000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_006",
+      "parentId": "fld_outdoors",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "url": "{{ _.base_url }}/api/outdoors",
+      "name": "Listar Todos Outdoors",
+      "description": "Lista todos os outdoors (requer autenticação)",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704066700000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_007",
+      "parentId": "fld_outdoors",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "url": "{{ _.base_url }}/api/outdoors",
+      "name": "Listar Outdoors Ativos",
+      "description": "Lista apenas outdoors ativos",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        {
+          "name": "ativo",
+          "value": "true",
+          "description": "Filtrar por status ativo"
+        }
+      ],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704066600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_008",
+      "parentId": "fld_outdoors",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "url": "{{ _.base_url }}/api/outdoors/1",
+      "name": "Buscar Outdoor por ID",
+      "description": "Retorna detalhes de um outdoor específico",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704066500000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_009",
+      "parentId": "fld_outdoors",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "url": "{{ _.base_url }}/api/outdoors",
+      "name": "Criar Novo Outdoor",
+      "description": "Cadastra um novo outdoor",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome\": \"Outdoor Teste API\",\n  \"localizacao\": \"Rua Teste, 123 - Centro\",\n  \"dimensoes\": \"9x3 metros\",\n  \"preco_mensal\": 4500.00,\n  \"foto_url\": \"https://example.com/outdoor-teste.jpg\",\n  \"descricao\": \"Outdoor em localização estratégica para testes\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704066400000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_010",
+      "parentId": "fld_outdoors",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "url": "{{ _.base_url }}/api/outdoors/1",
+      "name": "Atualizar Outdoor",
+      "description": "Atualiza informações de um outdoor existente",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome\": \"Outdoor Atualizado\",\n  \"localizacao\": \"Nova Localização, 456\",\n  \"dimensoes\": \"10x4 metros\",\n  \"preco_mensal\": 5500.00,\n  \"foto_url\": \"https://example.com/outdoor-novo.jpg\",\n  \"descricao\": \"Descrição atualizada do outdoor\",\n  \"ativo\": true\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704066300000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_011",
+      "parentId": "fld_outdoors",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "url": "{{ _.base_url }}/api/outdoors/1",
+      "name": "Desativar Outdoor",
+      "description": "Desativa um outdoor (soft delete)",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome\": \"Outdoor Desativado\",\n  \"localizacao\": \"Localização\",\n  \"dimensoes\": \"9x3 metros\",\n  \"preco_mensal\": 4500.00,\n  \"ativo\": false\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704066200000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_012",
+      "parentId": "fld_outdoors",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "url": "{{ _.base_url }}/api/outdoors/5",
+      "name": "Deletar Outdoor",
+      "description": "Remove permanentemente um outdoor",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704066100000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_013",
+      "parentId": "fld_disponibilidade",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "url": "{{ _.base_url }}/api/disponibilidade",
+      "name": "Listar Disponibilidades por Período",
+      "description": "Lista todas as disponibilidades de um mês/ano",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        {
+          "name": "mes",
+          "value": "7",
+          "description": "Mês (1-12)"
+        },
+        {
+          "name": "ano",
+          "value": "2024",
+          "description": "Ano"
+        }
+      ],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704066000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_014",
+      "parentId": "fld_disponibilidade",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "url": "{{ _.base_url }}/api/disponibilidade/outdoor/1",
+      "name": "Histórico de Disponibilidade do Outdoor",
+      "description": "Lista todo histórico de disponibilidade de um outdoor",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704065900000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_015",
+      "parentId": "fld_disponibilidade",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "url": "{{ _.base_url }}/api/disponibilidade/check/1",
+      "name": "Verificar Disponibilidade",
+      "description": "Verifica se um outdoor está disponível em um período",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        {
+          "name": "mes",
+          "value": "8",
+          "description": "Mês (1-12)"
+        },
+        {
+          "name": "ano",
+          "value": "2024",
+          "description": "Ano"
+        }
+      ],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704065800000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_016",
+      "parentId": "fld_disponibilidade",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "url": "{{ _.base_url }}/api/disponibilidade/reservar",
+      "name": "Criar Reserva",
+      "description": "Cria uma nova reserva para um outdoor",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"outdoor_id\": 3,\n  \"mes\": 8,\n  \"ano\": 2024,\n  \"cliente_nome\": \"Empresa Teste\",\n  \"cliente_contato\": \"(11) 98765-4321\",\n  \"cliente_email\": \"contato@empresateste.com\",\n  \"observacoes\": \"Campanha de lançamento de produto\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704065700000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_017",
+      "parentId": "fld_disponibilidade",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "url": "{{ _.base_url }}/api/disponibilidade/cancelar/1",
+      "name": "Cancelar Reserva",
+      "description": "Cancela uma reserva existente",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704065600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_018",
+      "parentId": "fld_disponibilidade",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "url": "{{ _.base_url }}/api/disponibilidade/relatorio",
+      "name": "Relatório de Ocupação",
+      "description": "Gera relatório de ocupação dos outdoors",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        {
+          "name": "startMonth",
+          "value": "1",
+          "description": "Mês inicial"
+        },
+        {
+          "name": "startYear",
+          "value": "2024",
+          "description": "Ano inicial"
+        },
+        {
+          "name": "endMonth",
+          "value": "12",
+          "description": "Mês final"
+        },
+        {
+          "name": "endYear",
+          "value": "2024",
+          "description": "Ano final"
+        }
+      ],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704065500000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_019",
+      "parentId": "fld_health",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "url": "{{ _.base_url }}/api/health",
+      "name": "Health Check",
+      "description": "Verifica se a API está funcionando",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1704065400000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_auth",
+      "parentId": "wrk_outdoor",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "name": "🔐 Autenticação",
+      "description": "Endpoints de autenticação e autorização",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1704067200000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_public",
+      "parentId": "wrk_outdoor",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "name": "🌐 Rotas Públicas",
+      "description": "Endpoints que não requerem autenticação",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1704067100000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_outdoors",
+      "parentId": "wrk_outdoor",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "name": "📋 Outdoors (Admin)",
+      "description": "Gerenciamento de outdoors - Requer autenticação",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1704067000000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_disponibilidade",
+      "parentId": "wrk_outdoor",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "name": "📅 Disponibilidade (Admin)",
+      "description": "Gerenciamento de disponibilidade e reservas - Requer autenticação",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1704066900000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_health",
+      "parentId": "wrk_outdoor",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "name": "🏥 Health Check",
+      "description": "Verificação de status da API",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1704066800000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "wrk_outdoor",
+      "parentId": null,
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "name": "Sistema de Aluguel de Outdoors",
+      "description": "API para gerenciamento de aluguel de outdoors publicitários",
+      "scope": "collection",
+      "_type": "workspace"
+    },
+    {
+      "_id": "env_base",
+      "parentId": "wrk_outdoor",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:3333",
+        "token": "COLE_SEU_TOKEN_AQUI_APOS_LOGIN"
+      },
+      "dataPropertyOrder": {
+        "&": ["base_url", "token"]
+      },
+      "color": null,
+      "isPrivate": false,
+      "metaSortKey": 1704067200000,
+      "_type": "environment"
+    },
+    {
+      "_id": "env_dev",
+      "parentId": "env_base",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "name": "Development",
+      "data": {
+        "base_url": "http://localhost:3333",
+        "token": ""
+      },
+      "dataPropertyOrder": {
+        "&": ["base_url", "token"]
+      },
+      "color": "#7CFC00",
+      "isPrivate": false,
+      "metaSortKey": 1704067200001,
+      "_type": "environment"
+    },
+    {
+      "_id": "env_prod",
+      "parentId": "env_base",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "name": "Production",
+      "data": {
+        "base_url": "https://api.outdoors.com.br",
+        "token": ""
+      },
+      "dataPropertyOrder": {
+        "&": ["base_url", "token"]
+      },
+      "color": "#FF6347",
+      "isPrivate": false,
+      "metaSortKey": 1704067200002,
+      "_type": "environment"
+    }
+  ]
+}

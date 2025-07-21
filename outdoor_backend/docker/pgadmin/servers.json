@@ -1,0 +1,15 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Outdoor Rental DB",
+      "Group": "Servers",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "outdoor_rental",
+      "Username": "outdoor_user",
+      "Password": "outdoor_pass",
+      "SSLMode": "prefer",
+      "PassFile": "/tmp/pgpassfile"
+    }
+  }
+}

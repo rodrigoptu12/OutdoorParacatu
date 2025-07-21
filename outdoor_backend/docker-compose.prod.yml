@@ -1,0 +1,21 @@
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+    restart: always
+    command: node server.js
+
+  postgres:
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  nginx:
+    restart: always
+    volumes:
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro

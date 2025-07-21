@@ -1,0 +1,97 @@
+services:
+  # Banco de dados PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: outdoor_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-outdoor_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-outdoor_pass}
+      POSTGRES_DB: ${DB_NAME:-outdoor_rental}
+      TZ: America/Sao_Paulo
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init-db:/docker-entrypoint-initdb.d
+    networks:
+      - outdoor_network
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${DB_USER:-outdoor_user} -d ${DB_NAME:-outdoor_rental}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # pgAdmin para gerenciamento do banco
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: outdoor_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@outdoor.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin123}
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./docker/pgadmin/servers.json:/pgadmin4/servers.json
+    networks:
+      - outdoor_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Backend Node.js
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: outdoor_backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: ${PORT:-3333}
+      DATABASE_URL: postgresql://${DB_USER:-outdoor_user}:${DB_PASSWORD:-outdoor_pass}@postgres:5432/${DB_NAME:-outdoor_rental}
+      JWT_SECRET: ${JWT_SECRET:-seu_jwt_secret_super_seguro_2024}
+    ports:
+      - "3333:3333"
+    volumes:
+      - ./src:/app/src
+      - ./package.json:/app/package.json
+      - ./package-lock.json:/app/package-lock.json
+      - ./server.js:/app/server.js
+      - node_modules:/app/node_modules
+    networks:
+      - outdoor_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: sh -c "npm install && npm run dev"
+
+  # Redis para cache (opcional)
+  redis:
+    image: redis:7-alpine
+    container_name: outdoor_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - outdoor_network
+    command: redis-server --appendonly yes
+
+networks:
+  outdoor_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+  redis_data:
+  node_modules:
