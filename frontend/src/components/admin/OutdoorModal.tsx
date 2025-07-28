@@ -61,7 +61,7 @@ export default function OutdoorModal({
       });
     }
     setError("");
-  }, [outdoor]);
+  }, [outdoor, isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,29 +100,47 @@ export default function OutdoorModal({
     }
   };
 
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        <div
-          className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
-          onClick={onClose}
-        />
+      <div
+        className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0"
+        onClick={handleOverlayClick}
+      >
+        {/* Overlay */}
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
 
-        <div className="inline-block w-full max-w-2xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white rounded-lg shadow-xl">
-          <div className="flex items-center justify-between px-6 py-4 border-b">
+        {/* Spacer for centering */}
+        <span
+          className="hidden sm:inline-block sm:align-middle sm:h-screen"
+          aria-hidden="true"
+        >
+          &#8203;
+        </span>
+
+        {/* Modal */}
+        <div className="relative inline-block w-full max-w-2xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white rounded-lg shadow-xl sm:align-middle">
+          {/* Header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
             <h3 className="text-lg font-medium text-gray-900">
               {outdoor ? "Editar Outdoor" : "Novo Outdoor"}
             </h3>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-500"
+              className="text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 rounded-md p-1"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
+          {/* Body */}
           <form onSubmit={handleSubmit} className="px-6 py-4">
             {error && (
               <div className="mb-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
@@ -132,8 +150,8 @@ export default function OutdoorModal({
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Nome do Outdoor
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nome do Outdoor *
                 </label>
                 <input
                   type="text"
@@ -142,13 +160,13 @@ export default function OutdoorModal({
                   onChange={(e) =>
                     setFormData({ ...formData, nome: e.target.value })
                   }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm px-3 py-2 border"
                 />
               </div>
 
               <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Localização
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Localização *
                 </label>
                 <input
                   type="text"
@@ -157,13 +175,13 @@ export default function OutdoorModal({
                   onChange={(e) =>
                     setFormData({ ...formData, localizacao: e.target.value })
                   }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm px-3 py-2 border"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Dimensões
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Dimensões *
                 </label>
                 <input
                   type="text"
@@ -173,13 +191,13 @@ export default function OutdoorModal({
                   onChange={(e) =>
                     setFormData({ ...formData, dimensoes: e.target.value })
                   }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm px-3 py-2 border"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Preço Mensal (R$)
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Preço Mensal (R$) *
                 </label>
                 <input
                   type="number"
@@ -190,12 +208,12 @@ export default function OutdoorModal({
                   onChange={(e) =>
                     setFormData({ ...formData, preco_mensal: e.target.value })
                   }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm px-3 py-2 border"
                 />
               </div>
 
               <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   URL da Foto
                 </label>
                 <input
@@ -204,12 +222,12 @@ export default function OutdoorModal({
                   onChange={(e) =>
                     setFormData({ ...formData, foto_url: e.target.value })
                   }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm px-3 py-2 border"
                 />
               </div>
 
               <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Descrição
                 </label>
                 <textarea
@@ -218,7 +236,7 @@ export default function OutdoorModal({
                   onChange={(e) =>
                     setFormData({ ...formData, descricao: e.target.value })
                   }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm px-3 py-2 border"
                 />
               </div>
 
@@ -239,7 +257,8 @@ export default function OutdoorModal({
               </div>
             </div>
 
-            <div className="mt-6 flex justify-end space-x-3">
+            {/* Footer */}
+            <div className="mt-6 flex justify-end space-x-3 pt-4 border-t border-gray-200">
               <button
                 type="button"
                 onClick={onClose}
