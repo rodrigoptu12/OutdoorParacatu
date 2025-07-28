@@ -44,6 +44,26 @@ make logs      # Ver logs
 make shell     # Acessar shell do backend
 make seed      # Executar seed
 make psql      # Acessar PostgreSQL
+
+# Para subir SEM reinicializar (mais rápido)
+make quick-up
+
+# Para subir COM inicialização (primeira vez)
+make up
+
+# Para verificar status
+make status
+
+# Desenvolvimento diário (rápido)
+make quick-up
+make status
+make logs
+
+# Reset completo quando necessário
+make reset
+
+# Para parar
+make down
 ```
 
 ### Usando Docker Compose diretamente

@@ -1,0 +1,27 @@
+# Dockerfile.dev para Frontend React
+FROM node:18-alpine
+
+# Definir diretório de trabalho
+WORKDIR /app
+
+# Instalar dependências do sistema necessárias
+RUN apk add --no-cache git
+
+# Copiar package.json e package-lock.json
+COPY package*.json ./
+
+# Instalar dependências
+RUN npm ci --only=production=false
+
+# Copiar código fonte
+COPY . .
+
+# Expor porta do desenvolvimento
+EXPOSE 3000
+
+# Configurar variáveis de ambiente para hot reload
+ENV CHOKIDAR_USEPOLLING=true
+ENV WATCHPACK_POLLING=true
+
+# Comando padrão
+CMD ["npm", "run", "dev"]
