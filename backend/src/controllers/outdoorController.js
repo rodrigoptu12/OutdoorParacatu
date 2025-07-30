@@ -73,18 +73,41 @@ class OutdoorController {
 
   async getWithAvailability(req, res) {
     try {
-      const { mes, ano } = req.query;
+      const { data_inicio, data_fim } = req.query;
 
-      const mesAtual = mes || new Date().getMonth() + 1;
-      const anoAtual = ano || new Date().getFullYear();
+      // Se não fornecer datas, usar próximos 30 dias
+      const hoje = new Date();
+      const dataInicio = data_inicio || hoje.toISOString().split('T')[0];
+      const dataFimDefault = new Date(hoje);
+      dataFimDefault.setDate(dataFimDefault.getDate() + 30);
+      const dataFim = data_fim || dataFimDefault.toISOString().split('T')[0];
 
-      const outdoors = await Outdoor.getWithAvailability(mesAtual, anoAtual);
+      const outdoors = await Outdoor.getWithAvailability(dataInicio, dataFim);
       res.json({
-        periodo: { mes: mesAtual, ano: anoAtual },
+        periodo: { 
+          data_inicio: dataInicio, 
+          data_fim: dataFim 
+        },
         outdoors,
       });
     } catch (error) {
       res.status(500).json({ error: "Erro ao buscar disponibilidade" });
+    }
+  }
+
+  async getAvailableDates(req, res) {
+    try {
+      const { id } = req.params;
+      const { data_inicio, data_fim } = req.query;
+
+      if (!data_inicio || !data_fim) {
+        return res.status(400).json({ error: "Data inicial e final são obrigatórias" });
+      }
+
+      const disponibilidade = await Outdoor.getAvailableDates(id, data_inicio, data_fim);
+      res.json(disponibilidade);
+    } catch (error) {
+      res.status(500).json({ error: "Erro ao buscar datas disponíveis" });
     }
   }
 }

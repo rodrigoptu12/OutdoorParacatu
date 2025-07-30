@@ -23,12 +23,20 @@ const outdoorValidation = [
 
 const reservationValidation = [
   body("outdoor_id").isInt().withMessage("ID do outdoor inválido"),
-  body("mes")
-    .isInt({ min: 1, max: 12 })
-    .withMessage("Mês deve estar entre 1 e 12"),
-  body("ano")
-    .isInt({ min: 2024 })
-    .withMessage("Ano deve ser 2024 ou posterior"),
+  body("data_inicio")
+    .isISO8601()
+    .toDate()
+    .withMessage("Data inicial inválida"),
+  body("data_fim")
+    .isISO8601()
+    .toDate()
+    .withMessage("Data final inválida")
+    .custom((value, { req }) => {
+      if (new Date(value) < new Date(req.body.data_inicio)) {
+        throw new Error("Data final deve ser maior ou igual à data inicial");
+      }
+      return true;
+    }),
   body("cliente_nome")
     .notEmpty()
     .trim()
@@ -48,11 +56,22 @@ const loginValidation = [
 ];
 
 const periodValidation = [
-  query("mes")
+  query("data_inicio")
     .optional()
-    .isInt({ min: 1, max: 12 })
-    .withMessage("Mês inválido"),
-  query("ano").optional().isInt({ min: 2024 }).withMessage("Ano inválido"),
+    .isISO8601()
+    .toDate()
+    .withMessage("Data inicial inválida"),
+  query("data_fim")
+    .optional()
+    .isISO8601()
+    .toDate()
+    .withMessage("Data final inválida")
+    .custom((value, { req }) => {
+      if (req.query.data_inicio && new Date(value) < new Date(req.query.data_inicio)) {
+        throw new Error("Data final deve ser maior ou igual à data inicial");
+      }
+      return true;
+    }),
   handleValidationErrors,
 ];
 

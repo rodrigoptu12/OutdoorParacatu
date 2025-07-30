@@ -1,6 +1,7 @@
 require('dotenv').config();
 const pool = require('../config/database');
 const bcrypt = require('bcryptjs');
+
 async function seed() {
   try {
     console.log('🌱 Iniciando seed do banco de dados...');
@@ -70,31 +71,49 @@ async function seed() {
     console.log('✅ Outdoors de exemplo criados');
 
     // Criar algumas reservas de exemplo
+    const hoje = new Date();
     const reservas = [
       {
         outdoor_id: 1,
-        mes: new Date().getMonth() + 1,
-        ano: new Date().getFullYear(),
+        data_inicio: new Date(hoje.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Daqui 7 dias
+        data_fim: new Date(hoje.getTime() + 21 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Por 14 dias
         cliente_nome: 'Empresa ABC',
         cliente_contato: '(11) 98765-4321',
-        cliente_email: 'contato@empresaabc.com'
+        cliente_email: 'contato@empresaabc.com',
+        dias: 14,
+        preco_mensal: 5000
       },
       {
         outdoor_id: 2,
-        mes: new Date().getMonth() + 2,
-        ano: new Date().getFullYear(),
+        data_inicio: new Date(hoje.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Daqui 30 dias
+        data_fim: new Date(hoje.getTime() + 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Por 30 dias
         cliente_nome: 'Loja XYZ',
         cliente_contato: '(11) 91234-5678',
-        cliente_email: 'marketing@lojaxyz.com'
+        cliente_email: 'marketing@lojaxyz.com',
+        dias: 30,
+        preco_mensal: 8000
+      },
+      {
+        outdoor_id: 3,
+        data_inicio: hoje.toISOString().split('T')[0], // Hoje
+        data_fim: new Date(hoje.getTime() + 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Por 10 dias
+        cliente_nome: 'Supermercado Local',
+        cliente_contato: '(11) 95555-1234',
+        cliente_email: 'marketing@supermercado.com',
+        dias: 10,
+        preco_mensal: 3500
       }
     ];
 
     for (const reserva of reservas) {
+      const valorDiario = reserva.preco_mensal / 30;
+      const valorTotal = valorDiario * reserva.dias;
+      
       await pool.query(
-        `INSERT INTO disponibilidade (outdoor_id, mes, ano, status, cliente_nome, cliente_contato, cliente_email, data_reserva)
-         VALUES ($1, $2, $3, 'ocupado', $4, $5, $6, CURRENT_TIMESTAMP)
-         ON CONFLICT (outdoor_id, mes, ano) DO NOTHING`,
-        [reserva.outdoor_id, reserva.mes, reserva.ano, reserva.cliente_nome, reserva.cliente_contato, reserva.cliente_email]
+        `INSERT INTO disponibilidade (outdoor_id, data_inicio, data_fim, status, cliente_nome, cliente_contato, cliente_email, valor_total)
+         VALUES ($1, $2, $3, 'ocupado', $4, $5, $6, $7)
+         ON CONFLICT DO NOTHING`,
+        [reserva.outdoor_id, reserva.data_inicio, reserva.data_fim, reserva.cliente_nome, reserva.cliente_contato, reserva.cliente_email, valorTotal]
       );
     }
     console.log('✅ Reservas de exemplo criadas');

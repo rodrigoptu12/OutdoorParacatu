@@ -104,7 +104,18 @@
       "description": "Lista outdoors com disponibilidade do mês atual",
       "method": "GET",
       "body": {},
-      "parameters": [],
+      "parameters": [
+        {
+          "name": "data_inicio",
+          "value": "2025-07-30",
+          "description": "Data inicial (YYYY-MM-DD)"
+        },
+        {
+          "name": "data_fim",
+          "value": "2025-08-29",
+          "description": "Data final (YYYY-MM-DD)"
+        }
+      ],
       "headers": [],
       "authentication": {},
       "metaSortKey": -1704066900000,
@@ -129,14 +140,14 @@
       "body": {},
       "parameters": [
         {
-          "name": "mes",
-          "value": "7",
-          "description": "Mês (1-12)"
+          "name": "data_inicio",
+          "value": "2025-07-30",
+          "description": "Data inicial (YYYY-MM-DD)"
         },
         {
-          "name": "ano",
-          "value": "2024",
-          "description": "Ano"
+          "name": "data_fim",
+          "value": "2025-08-29",
+          "description": "Data final (YYYY-MM-DD)"
         }
       ],
       "headers": [],
@@ -386,14 +397,14 @@
       "body": {},
       "parameters": [
         {
-          "name": "mes",
-          "value": "7",
-          "description": "Mês (1-12)"
+          "name": "data_inicio",
+          "value": "2025-07-30",
+          "description": "Data inicial (YYYY-MM-DD)"
         },
         {
-          "name": "ano",
-          "value": "2024",
-          "description": "Ano"
+          "name": "data_fim",
+          "value": "2025-08-29",
+          "description": "Data final (YYYY-MM-DD)"
         }
       ],
       "headers": [
@@ -453,14 +464,14 @@
       "body": {},
       "parameters": [
         {
-          "name": "mes",
-          "value": "8",
-          "description": "Mês (1-12)"
+          "name": "data_inicio",
+          "value": "2025-07-30",
+          "description": "Data inicial (YYYY-MM-DD)"
         },
         {
-          "name": "ano",
-          "value": "2024",
-          "description": "Ano"
+          "name": "data_fim",
+          "value": "2025-08-29",
+          "description": "Data final (YYYY-MM-DD)"
         }
       ],
       "headers": [
@@ -555,24 +566,14 @@
       "body": {},
       "parameters": [
         {
-          "name": "startMonth",
-          "value": "1",
-          "description": "Mês inicial"
+          "name": "data_inicio",
+          "value": "2024-01-01",
+          "description": "Data inicial (YYYY-MM-DD)"
         },
         {
-          "name": "startYear",
-          "value": "2024",
-          "description": "Ano inicial"
-        },
-        {
-          "name": "endMonth",
-          "value": "12",
-          "description": "Mês final"
-        },
-        {
-          "name": "endYear",
-          "value": "2024",
-          "description": "Ano final"
+          "name": "data_fim",
+          "value": "2024-12-31",
+          "description": "Data final (YYYY-MM-DD)"
         }
       ],
       "headers": [
@@ -738,6 +739,84 @@
       "isPrivate": false,
       "metaSortKey": 1704067200002,
       "_type": "environment"
+    },
+    {
+      "_id": "req_1000",
+      "parentId": "fld_outdoors",
+      "modified": 1753833600000,
+      "created": 1753833600000,
+      "url": "{{ _.base_url }}/api/outdoors/with-availability",
+      "name": "Outdoors com Disponibilidade (Período)",
+      "description": "Retorna outdoors com disponibilidade entre duas datas",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        {
+          "name": "data_inicio",
+          "value": "2025-07-30",
+          "description": "Data inicial (YYYY-MM-DD)"
+        },
+        {
+          "name": "data_fim",
+          "value": "2025-08-29",
+          "description": "Data final (YYYY-MM-DD)"
+        }
+      ],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704064998999,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_1001",
+      "parentId": "fld_outdoors",
+      "modified": 1753833600000,
+      "created": 1753833600000,
+      "url": "{{ _.base_url }}/api/outdoors/1/available-dates",
+      "name": "Datas Disponíveis por Outdoor",
+      "description": "Retorna datas disponíveis para um outdoor específico",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        {
+          "name": "data_inicio",
+          "value": "2025-07-30",
+          "description": "Data inicial (YYYY-MM-DD)"
+        },
+        {
+          "name": "data_fim",
+          "value": "2025-08-29",
+          "description": "Data final (YYYY-MM-DD)"
+        }
+      ],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704064998998,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
     }
   ]
 }

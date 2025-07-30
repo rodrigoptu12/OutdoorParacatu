@@ -21,20 +21,18 @@ CREATE TABLE
     IF NOT EXISTS disponibilidade (
         id SERIAL PRIMARY KEY,
         outdoor_id INTEGER REFERENCES outdoors (id) ON DELETE CASCADE,
-        mes INTEGER NOT NULL CHECK (
-            mes >= 1
-            AND mes <= 12
-        ),
-        ano INTEGER NOT NULL CHECK (ano >= 2024),
-        status VARCHAR(20) NOT NULL DEFAULT 'disponivel',
+        data_inicio DATE NOT NULL,
+        data_fim DATE NOT NULL,
+        status VARCHAR(20) NOT NULL DEFAULT 'ocupado',
         cliente_nome VARCHAR(100),
         cliente_contato VARCHAR(100),
         cliente_email VARCHAR(100),
-        data_reserva TIMESTAMP,
+        valor_total DECIMAL(10, 2) NOT NULL,
+        data_reserva TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         observacoes TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE (outdoor_id, mes, ano)
+        CONSTRAINT check_datas CHECK (data_fim >= data_inicio)
     );
 
 -- Tabela de Usuários Admin
@@ -50,6 +48,7 @@ CREATE TABLE
     );
 
 -- Índices para melhor performance
-CREATE INDEX idx_disponibilidade_mes_ano ON disponibilidade (mes, ano);
+CREATE INDEX idx_disponibilidade_datas ON disponibilidade (data_inicio, data_fim);
+CREATE INDEX idx_disponibilidade_outdoor ON disponibilidade (outdoor_id);
 
 CREATE INDEX idx_outdoors_ativo ON outdoors (ativo);

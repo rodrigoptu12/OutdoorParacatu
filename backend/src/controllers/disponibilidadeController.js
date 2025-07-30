@@ -3,13 +3,13 @@ const Disponibilidade = require("../models/Disponibilidade");
 class DisponibilidadeController {
   async getByPeriod(req, res) {
     try {
-      const { mes, ano } = req.query;
+      const { data_inicio, data_fim } = req.query;
 
-      if (!mes || !ano) {
-        return res.status(400).json({ error: "Mês e ano são obrigatórios" });
+      if (!data_inicio || !data_fim) {
+        return res.status(400).json({ error: "Data inicial e final são obrigatórias" });
       }
 
-      const disponibilidades = await Disponibilidade.findByPeriod(mes, ano);
+      const disponibilidades = await Disponibilidade.findByPeriod(data_inicio, data_fim);
       res.json(disponibilidades);
     } catch (error) {
       res.status(500).json({ error: "Erro ao buscar disponibilidades" });
@@ -31,23 +31,25 @@ class DisponibilidadeController {
   async checkAvailability(req, res) {
     try {
       const { outdoorId } = req.params;
-      const { mes, ano } = req.query;
+      const { data_inicio, data_fim } = req.query;
 
-      if (!mes || !ano) {
-        return res.status(400).json({ error: "Mês e ano são obrigatórios" });
+      if (!data_inicio || !data_fim) {
+        return res.status(400).json({ error: "Data inicial e final são obrigatórias" });
       }
 
-      const disponibilidade = await Disponibilidade.checkAvailability(
+      const conflitos = await Disponibilidade.checkAvailability(
         outdoorId,
-        mes,
-        ano
+        data_inicio,
+        data_fim
       );
-      const isAvailable =
-        !disponibilidade || disponibilidade.status === "disponivel";
+      const isAvailable = conflitos.length === 0;
 
       res.json({
         disponivel: isAvailable,
-        detalhes: disponibilidade,
+        conflitos: conflitos,
+        mensagem: isAvailable 
+          ? "Outdoor disponível para o período selecionado" 
+          : "Outdoor já reservado para o período selecionado"
       });
     } catch (error) {
       res.status(500).json({ error: "Erro ao verificar disponibilidade" });
@@ -57,7 +59,10 @@ class DisponibilidadeController {
   async createReservation(req, res) {
     try {
       const reserva = await Disponibilidade.createReservation(req.body);
-      res.status(201).json(reserva);
+      res.status(201).json({
+        message: "Reserva criada com sucesso",
+        reserva
+      });
     } catch (error) {
       if (error.message === "Outdoor já está reservado para este período") {
         return res.status(409).json({ error: error.message });
@@ -83,25 +88,18 @@ class DisponibilidadeController {
 
   async getOccupancyReport(req, res) {
     try {
-      const { startMonth, startYear, endMonth, endYear } = req.query;
+      const { data_inicio, data_fim } = req.query;
 
-      const startM = startMonth || 1;
-      const startY = startYear || new Date().getFullYear();
-      const endM = endMonth || 12;
-      const endY = endYear || new Date().getFullYear();
+      const startDate = data_inicio || new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0];
+      const endDate = data_fim || new Date().toISOString().split('T')[0];
 
-      const report = await Disponibilidade.getOccupancyReport(
-        startM,
-        startY,
-        endM,
-        endY
-      );
+      const report = await Disponibilidade.getOccupancyReport(startDate, endDate);
       res.json({
         periodo: {
-          inicio: { mes: startM, ano: startY },
-          fim: { mes: endM, ano: endY },
+          inicio: startDate,
+          fim: endDate
         },
-        relatorio: report,
+        ...report
       });
     } catch (error) {
       res.status(500).json({ error: "Erro ao gerar relatório de ocupação" });
