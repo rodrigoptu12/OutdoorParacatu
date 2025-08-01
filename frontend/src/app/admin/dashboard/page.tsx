@@ -10,7 +10,7 @@ interface DashboardData {
   outdoorsAtivos: number;
   reservasAtivas: number;
   taxaOcupacao: number;
-  receitaMensal: number;
+  receitaPeriodo: number;
   proximasReservas: any[];
 }
 
@@ -20,20 +20,40 @@ export default function AdminDashboard() {
     outdoorsAtivos: 0,
     reservasAtivas: 0,
     taxaOcupacao: 0,
-    receitaMensal: 0,
+    receitaPeriodo: 0,
     proximasReservas: [],
   });
   const [loading, setLoading] = useState(true);
+  const [periodo, setPeriodo] = useState({
+    inicio: "2025-08-01", // Padrão estático para SSR
+    fim: "2025-09-01",
+  });
+  // const [periodo, setPeriodo] = useState({
+  //   inicio: new Date().toISOString().split("T")[0],
+  //   fim: (() => {
+  //     const date = new Date();
+  //     date.setMonth(date.getMonth() + 1);
+  //     return date.toISOString().split("T")[0];
+  //   })(),
+  // });
+  useEffect(() => {
+    // Atualize periodo dinamicamente no cliente
+    const date = new Date();
+    const nextMonth = new Date(date);
+    nextMonth.setMonth(date.getMonth() + 1);
+    setPeriodo({
+      inicio: date.toISOString().split("T")[0],
+      fim: nextMonth.toISOString().split("T")[0],
+    });
+  }, []);
 
   useEffect(() => {
     fetchDashboardData();
-  }, []);
+  }, [periodo]);
 
   const fetchDashboardData = async () => {
     try {
       const token = localStorage.getItem("token");
-      const currentMonth = new Date().getMonth() + 1;
-      const currentYear = new Date().getFullYear();
 
       // Buscar outdoors
       const outdoorsRes = await fetch("http://localhost:3333/api/outdoors", {
@@ -43,9 +63,9 @@ export default function AdminDashboard() {
       });
       const outdoors = await outdoorsRes.json();
 
-      // Buscar disponibilidades do mês atual
+      // Buscar disponibilidades do período
       const disponibilidadeRes = await fetch(
-        `http://localhost:3333/api/disponibilidade?mes=${currentMonth}&ano=${currentYear}`,
+        `http://localhost:3333/api/disponibilidade?data_inicio=${periodo.inicio}&data_fim=${periodo.fim}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -54,33 +74,41 @@ export default function AdminDashboard() {
       );
       const disponibilidades = await disponibilidadeRes.json();
 
+      // Buscar relatório de ocupação
+      const relatorioRes = await fetch(
+        `http://localhost:3333/api/disponibilidade/relatorio?data_inicio=${periodo.inicio}&data_fim=${periodo.fim}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const relatorio = await relatorioRes.json();
+
       // Calcular estatísticas
       const totalOutdoors = outdoors.length;
       const outdoorsAtivos = outdoors.filter((o: any) => o.ativo).length;
       const reservasAtivas = disponibilidades.filter(
         (d: any) => d.status === "ocupado"
       ).length;
-      const taxaOcupacao =
-        outdoorsAtivos > 0
-          ? Math.round((reservasAtivas / outdoorsAtivos) * 100)
-          : 0;
 
-      // Calcular receita mensal
-      const receitaMensal = disponibilidades
+      const receitaPeriodo = disponibilidades
         .filter((d: any) => d.status === "ocupado")
-        .reduce((total: number, d: any) => {
-          const outdoor = outdoors.find((o: any) => o.id === d.outdoor_id);
-          return total + (outdoor?.preco_mensal || 0);
-        }, 0);
+        .reduce((total: number, d: any) => total + Number(d.valor_total), 0);
 
       setData({
         totalOutdoors,
         outdoorsAtivos,
         reservasAtivas,
-        taxaOcupacao,
-        receitaMensal,
+        taxaOcupacao: relatorio.taxa_ocupacao_media || 0,
+        receitaPeriodo,
         proximasReservas: disponibilidades
           .filter((d: any) => d.status === "ocupado")
+          .sort(
+            (a: any, b: any) =>
+              new Date(a.data_inicio).getTime() -
+              new Date(b.data_inicio).getTime()
+          )
           .slice(0, 5),
       });
     } catch (error) {
@@ -88,6 +116,11 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("pt-BR");
   };
 
   if (loading) {
@@ -138,6 +171,42 @@ export default function AdminDashboard() {
         <p className="text-gray-600 mt-1">Visão geral do sistema de outdoors</p>
       </div>
 
+      {/* Filtro de período */}
+      <div className="mb-6 bg-white p-4 rounded-lg shadow">
+        <div className="flex flex-col sm:flex-row gap-4 items-end">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Data Inicial
+            </label>
+            <input
+              type="date"
+              value={periodo.inicio}
+              onChange={(e) =>
+                setPeriodo({ ...periodo, inicio: e.target.value })
+              }
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Data Final
+            </label>
+            <input
+              type="date"
+              value={periodo.fim}
+              onChange={(e) => setPeriodo({ ...periodo, fim: e.target.value })}
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
+            />
+          </div>
+          {/* <button
+            onClick={fetchDashboardData}
+            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+          >
+            Atualizar
+          </button> */}
+        </div>
+      </div>
+
       {/* Cards de estatísticas */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         {stats.map((stat) => (
@@ -167,34 +236,36 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      {/* Receita Mensal
+      {/* Receita do Período */}
       <div className="bg-white shadow rounded-lg mb-8">
         <div className="px-6 py-4 border-b border-gray-200">
           <div className="flex items-center">
             <DollarSign className="h-5 w-5 text-green-500 mr-2" />
             <h3 className="text-lg font-medium text-gray-900">
-              Receita Mensal Estimada
+              Receita do Período
             </h3>
           </div>
         </div>
         <div className="px-6 py-4">
           <p className="text-3xl font-bold text-green-600">
             R${" "}
-            {data.receitaMensal.toLocaleString("pt-BR", {
+            {data.receitaPeriodo.toLocaleString("pt-BR", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
           </p>
           <p className="text-sm text-gray-500 mt-1">
-            Baseado nas reservas ativas do mês atual
+            Total de receita das reservas no período selecionado
           </p>
         </div>
-      </div> */}
+      </div>
 
       {/* Próximas Reservas */}
       <div className="bg-white shadow rounded-lg">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">Reservas Ativas</h3>
+          <h3 className="text-lg font-medium text-gray-900">
+            Próximas Reservas
+          </h3>
         </div>
         <div className="px-6 py-4">
           {data.proximasReservas.length > 0 ? (
@@ -211,13 +282,29 @@ export default function AdminDashboard() {
                     <p className="text-sm text-gray-500">
                       Cliente: {reserva.cliente_nome}
                     </p>
+                    <p className="text-xs text-gray-400">
+                      {formatDate(reserva.data_inicio)} -{" "}
+                      {formatDate(reserva.data_fim)}
+                    </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-gray-900">
-                      {reserva.mes}/{reserva.ano}
+                    <p className="text-sm font-medium text-green-600">
+                      R${" "}
+                      {reserva.valor_total.toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </p>
                     <p className="text-xs text-gray-500">
-                      {reserva.localizacao}
+                      {(() => {
+                        const dias =
+                          Math.ceil(
+                            (new Date(reserva.data_fim).getTime() -
+                              new Date(reserva.data_inicio).getTime()) /
+                              (1000 * 60 * 60 * 24)
+                          ) + 1;
+                        return `${dias} dias`;
+                      })()}
                     </p>
                   </div>
                 </div>
@@ -225,7 +312,7 @@ export default function AdminDashboard() {
             </div>
           ) : (
             <p className="text-gray-500 text-center py-4">
-              Nenhuma reserva ativa no momento
+              Nenhuma reserva ativa no período selecionado
             </p>
           )}
         </div>
