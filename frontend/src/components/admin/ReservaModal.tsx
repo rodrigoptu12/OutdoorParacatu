@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { X, Calendar, AlertCircle } from "lucide-react";
+import DatePickerWithOccupancy from "./DatePickerWithOccupancy";
 
 interface ReservaModalProps {
   isOpen: boolean;
@@ -23,6 +24,13 @@ interface ConflitosInfo {
   disponivel: boolean;
   conflitos: any[];
   mensagem: string;
+}
+
+interface PeriodoOcupado {
+  data_inicio: string;
+  data_fim: string;
+  cliente_nome?: string;
+  outdoor_id: number;
 }
 
 export default function ReservaModal({
@@ -51,6 +59,10 @@ export default function ReservaModal({
   const [disponibilidade, setDisponibilidade] = useState<ConflitosInfo | null>(
     null
   );
+  const [periodosOcupados, setPeriodosOcupados] = useState<PeriodoOcupado[]>(
+    []
+  );
+  const [loadingPeriodos, setLoadingPeriodos] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -68,8 +80,19 @@ export default function ReservaModal({
       setError("");
       setValorEstimado(null);
       setDisponibilidade(null);
+      setPeriodosOcupados([]);
     }
   }, [isOpen, dataInicio, dataFim]);
+
+  useEffect(() => {
+    // Buscar períodos ocupados quando selecionar um outdoor
+    if (formData.outdoor_id) {
+      fetchPeriodosOcupados(formData.outdoor_id);
+      console.log("Fetching occupied periods for outdoor:", formData.outdoor_id);
+    } else {
+      setPeriodosOcupados([]);
+    }
+  }, [formData.outdoor_id]);
 
   useEffect(() => {
     // Calcular dias e valor estimado quando mudar datas ou outdoor
@@ -119,6 +142,42 @@ export default function ReservaModal({
       setLoadingOutdoors(false);
     }
   };
+  const fetchPeriodosOcupados = async (outdoorId: string) => {
+    setLoadingPeriodos(true);
+    setPeriodosOcupados([]); // Limpa os períodos anteriores
+    try {
+      const token = localStorage.getItem("token");
+      const hoje = new Date();
+      const seisMesesDepois = new Date();
+      seisMesesDepois.setMonth(seisMesesDepois.getMonth() + 6);
+      const response = await fetch(
+        `http://localhost:3333/api/disponibilidade?outdoor_id=${outdoorId}&data_inicio=${
+          hoje.toISOString().split("T")[0]
+        }&data_fim=${seisMesesDepois.toISOString().split("T")[0]}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      const ocupados = data
+        .filter((d: any) => d.status === "ocupado")
+        .filter((d: any) => d.outdoor_id === parseInt(outdoorId))
+        .map((d: any) => ({
+          data_inicio: d.data_inicio,
+          data_fim: d.data_fim,
+          cliente_nome: d.cliente_nome,
+          outdoor_id: parseInt(outdoorId),
+        }));
+      setPeriodosOcupados(ocupados);
+    } catch (error) {
+      console.error("Erro ao buscar períodos ocupados:", error);
+      setError("Erro ao carregar períodos ocupados");
+    } finally {
+      setLoadingPeriodos(false);
+    }
+  };
 
   const checkAvailability = async () => {
     if (!formData.outdoor_id || !formData.data_inicio || !formData.data_fim)
@@ -142,6 +201,31 @@ export default function ReservaModal({
     } finally {
       setCheckingAvailability(false);
     }
+  };
+
+  // Função para verificar se uma data está ocupada
+  const isDateOccupied = (dateString: string) => {
+    const date = new Date(dateString);
+    return periodosOcupados.some((periodo) => {
+      const inicio = new Date(periodo.data_inicio);
+      const fim = new Date(periodo.data_fim);
+      return date >= inicio && date <= fim;
+    });
+  };
+
+  // Função para gerar lista de datas ocupadas para o input de data
+  const getOccupiedDatesForInput = () => {
+    const occupiedDates: string[] = [];
+
+    periodosOcupados.forEach((periodo) => {
+      const inicio = new Date(periodo.data_inicio);
+      const fim = new Date(periodo.data_fim);
+
+      for (let d = new Date(inicio); d <= fim; d.setDate(d.getDate() + 1)) {
+        occupiedDates.push(d.toISOString().split("T")[0]);
+      }
+    });
+    return occupiedDates;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -266,52 +350,155 @@ export default function ReservaModal({
                     ))}
                   </select>
                 </div>
-
-                {/* Datas */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Data Inicial *
-                    </label>
-                    <input
-                      type="date"
-                      required
-                      value={formData.data_inicio}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          data_inicio: e.target.value,
-                        })
-                      }
-                      min={new Date().toISOString().split("T")[0]}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm px-3 py-2 border"
-                    />
+                {formData.outdoor_id && periodosOcupados.length > 0 && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                    <div className="flex items-start">
+                      <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 mr-2" />
+                      <div>
+                        {loadingPeriodos ? (
+                          <p className="text-sm text-red-700">
+                            Carregando períodos ocupados...
+                          </p>
+                        ) : (
+                          <>
+                            <p className="text-sm font-medium text-red-800">
+                              Períodos já reservados:
+                            </p>
+                            {periodosOcupados.filter(
+                              (periodo) =>
+                                periodo.outdoor_id ===
+                                parseInt(formData.outdoor_id)
+                            ).length > 0 ? (
+                              <ul className="mt-1 text-xs text-red-700 space-y-1">
+                                {periodosOcupados
+                                  .filter(
+                                    (periodo) =>
+                                      periodo.outdoor_id ===
+                                      parseInt(formData.outdoor_id)
+                                  )
+                                  .slice(0, 5)
+                                  .map((periodo, index) => (
+                                    <li key={index}>
+                                      {new Date(
+                                        periodo.data_inicio
+                                      ).toLocaleDateString("pt-BR")}{" "}
+                                      até{" "}
+                                      {new Date(
+                                        periodo.data_fim
+                                      ).toLocaleDateString("pt-BR")}
+                                      {periodo.cliente_nome && (
+                                        <span className="text-red-600">
+                                          {" "}
+                                          - {periodo.cliente_nome}
+                                        </span>
+                                      )}
+                                    </li>
+                                  ))}
+                                {periodosOcupados.filter(
+                                  (periodo) =>
+                                    periodo.outdoor_id ===
+                                    parseInt(formData.outdoor_id)
+                                ).length > 5 && (
+                                  <li className="text-red-600 font-medium">
+                                    e mais{" "}
+                                    {periodosOcupados.filter(
+                                      (periodo) =>
+                                        periodo.outdoor_id ===
+                                        parseInt(formData.outdoor_id)
+                                    ).length - 5}{" "}
+                                    períodos...
+                                  </li>
+                                )}
+                              </ul>
+                            ) : (
+                              <p className="text-sm text-red-700">
+                                Nenhum período reservado para este outdoor.
+                              </p>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
                   </div>
+                )}
+                {/* Datas com validação de ocupação */}
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div className="relative">
+                    <DatePickerWithOccupancy
+                      label="Data Inicial"
+                      value={formData.data_inicio}
+                      onChange={(date) => {
+                        if (date) {
+                          const newDate = date.toString().split("T")[0];
+                          if (formData.outdoor_id && isDateOccupied(newDate)) {
+                            setError(
+                              "Esta data está ocupada! Escolha outra data."
+                            );
+                            return;
+                          }
+                          setError("");
+                          setFormData({ ...formData, data_inicio: newDate });
+                        }
+                      }}
+                      required
+                      occupiedDates={getOccupiedDatesForInput()}
+                    />
+                    {loadingPeriodos && formData.outdoor_id && (
+                      <div className="absolute right-2 top-2">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-green-600"></div>
+                      </div>
+                    )}
+                  </div>
+                  {formData.outdoor_id && periodosOcupados.length > 0 && (
+                    <p className="mt-1 text-xs text-gray-500">
+                      Datas em vermelho estão ocupadas
+                    </p>
+                  )}
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Data Final *
-                    </label>
-                    <input
-                      type="date"
-                      required
+                    <DatePickerWithOccupancy
+                      label="Data Final"
                       value={formData.data_fim}
-                      onChange={(e) =>
-                        setFormData({ ...formData, data_fim: e.target.value })
-                      }
-                      min={
-                        formData.data_inicio ||
-                        new Date().toISOString().split("T")[0]
-                      }
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm px-3 py-2 border"
+                      onChange={(date) => {
+                        if (date) {
+                          const newDate = date.toString().split("T")[0];
+                          if (formData.outdoor_id && isDateOccupied(newDate)) {
+                            setError(
+                              "Esta data está ocupada! Escolha outra data."
+                            );
+                            return;
+                          }
+                          setError("");
+                          setFormData({ ...formData, data_fim: newDate });
+                        }
+                      }}
+                      required
+                      occupiedDates={getOccupiedDatesForInput()}
                     />
                   </div>
                 </div>
+                {/* Aviso sobre disponibilidade */}
+                {disponibilidade && !disponibilidade.disponivel && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                    <div className="flex items-start">
+                      <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 mr-2" />
+                      <div>
+                        <p className="text-sm font-medium text-red-800">
+                          Período não disponível
+                        </p>
+                        <p className="text-xs text-red-700 mt-1">
+                          {disponibilidade.mensagem}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Informações de disponibilidade e valor */}
                 {formData.outdoor_id &&
                   formData.data_inicio &&
-                  formData.data_fim && (
+                  formData.data_fim &&
+                  disponibilidade?.disponivel && (
                     <div className="bg-gray-50 rounded-lg p-4 space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">Período:</span>
